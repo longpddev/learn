@@ -38,7 +38,7 @@
 
         #body {}
 
-        ul {
+        .content ul {
             list-style: none;
             display: flex;
             flex-direction: column;
@@ -47,24 +47,24 @@
             margin-top: 30px;
         }
 
-        li {
+        .content li {
             font-size: 21px;
             display: flex;
             justify-content: space-between;
         }
 
-        .close {
+        .content .close {
             cursor: pointer;
             pointer-events: click;
             opacity: 0;
             transition: all 0.4s ease-in-out;
         }
 
-        li:hover .close {
+        .content li:hover .close {
             opacity: 1;
         }
 
-        li:hover {
+        .content li:hover {
             color: green;
         }
 
@@ -100,20 +100,14 @@
             <input type="text" id="input">
             <label for="">paste here</label>
         </div>
-        <div class="container" id="body">
+        <div class="container mt-3" id="body">
             <ul class="nav nav-tabs">
-                <li class="nav-item">
-                    <a class="nav-link active" data-toggle="tab" href="">Home</a>
-                </li>
+
             </ul>
 
             <!-- Tab panes -->
-            <div class="tab-content">
-                <div id="home" class="container tab-pane active">
-                    <ul>
-                        <li></li>
-                    </ul>
-                </div>
+            <div class="tab-content content">
+
             </div>
 
         </div>
@@ -215,21 +209,17 @@
         //    },
         //}
 
-        if (Cookies.get('myLearn')) {
+        if (Cookies.get('updated') != 'true') {
             let data = JSON.parse(Cookies.get('myLearn'));
-            for (let item in data) {
-                if ('date' in data[item]) { }
-                else {
-                    let dateText = (new Date()).toLocaleDateString();
-                    Cookies.set('myLearn', JSON.stringify({
-                        [dateText]: {
-                            date: dateText,
-                            ...data
-                        }
-                    }), { expires: 365 });
+            let dateText = (new Date()).toLocaleDateString();
+            Cookies.remove('myLearn');
+            Cookies.set('myLearn', JSON.stringify({
+                [dateText]: {
+                    ...data
                 }
-                break;
-            }
+            }), { expires: 365 });
+
+            Cookies.set('updated', 'true', { expires: 365 });
         }
 
         class word {
@@ -247,7 +237,6 @@
                 }
 
                 this.initTab();
-
                 this.wrap.on('click', '.close', function () {
                     let key = $(this).data('key');
                     let tabKey = $(this).parents('.tab-pane').attr('id').replace(/_/g, '/');
@@ -300,7 +289,6 @@
                     }
                 } else {
                     this.listText[tabByTime] = {
-                        date: tabByTime,
                         [textLower]: {
                             text: text,
                             count: 1
@@ -335,6 +323,7 @@
             }
 
             render() {
+                console.log(this.listText)
                 this.tab.html('');
                 this.content.html('');
                 for (let key in this.listText) {
@@ -350,12 +339,14 @@
                 this.storeCookie();
             }
             initTab() {
+                let _this = this;
                 this.wrap.on('click', '[data-toggle="tab"]', function () {
-                    this.tabActive = $(this).attr('active');
-                    this.activeTab();
-                }.bind(this));
+                    _this.tabActive = $(this).data('active');
+                    _this.activeTab();
+                });
             }
             activeTab() {
+                $('.tab-pane.active').removeClass('active');
                 $('#' + this.tabActive).tab('show');
             }
         }
@@ -364,7 +355,7 @@
         $(function () {
             $('#input').on('change', function () {
                 let val = $(this).val();
-                val.trim() && instantWord.setText(val), $(_this).val('');
+                val.trim() && instantWord.setText(val), $(this).val('');
             });
 
             let watch;
