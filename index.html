@@ -101,9 +101,21 @@
             <label for="">paste here</label>
         </div>
         <div class="container" id="body">
-            <ul>
-                <li></li>
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="">Home</a>
+                </li>
             </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div id="home" class="container tab-pane active">
+                    <ul>
+                        <li></li>
+                    </ul>
+                </div>
+            </div>
+
         </div>
     </div>
     <div class="translate" style="display:none">
@@ -193,21 +205,53 @@
 
 
     <script>
-        Cookies.set('foo', 'bar', { expires: 365 });
+
+        //listText = {
+        //    'date': {
+        //        text : {
+        //             text: text,
+        //             count: 1
+        //         }
+        //    },
+        //}
+
+        if (Cookies.get('myLearn')) {
+            let data = JSON.parse(Cookies.get('myLearn'));
+            for (let item in data) {
+                if ('date' in data) { }
+                else {
+                    let dateText = (new Date()).toDateString();
+                    Cookies.set('myLearn', JSON.stringify({
+                        [dateText]: {
+                            date: dateText,
+                            ...data
+                        }
+                    }), { expires: 365 });
+                }
+                break;
+            }
+        }
+
         class word {
             listText = {};
             constructor() {
-                this.wrap = $('#body ul');
+                this.wrap = $('#body');
+                this.content = this.wrap.find('.tab-content');
+                this.tab = this.wrap.find('.nav-tabs');
+                this.tabActive = (new Date).toLocaleDateString().replace(/\//g, '_');
                 let _this = this;
                 let getInCookie = this.getCookie();
                 if (getInCookie) {
                     this.listText = getInCookie
                     this.render();
                 }
+
+                this.initTab();
+
                 this.wrap.on('click', '.close', function () {
                     let key = $(this).data('key');
-                    console.log(key)
-                    key in _this.listText && delete _this.listText[key];
+                    let tabKey = $(this).parents('.tab-pane').attr('id').replace(/_/g, '/');
+                    key in _this.listText[tabKey] && delete _this.listText[tabKey][key];
                     _this.render();
                 })
 
@@ -241,32 +285,78 @@
             }
             setText(text) {
                 let textLower = text.trim().toLowerCase().replace(/\s+/, '_');
-                console.log(this.listText, textLower)
-                if (textLower in this.listText) {
-                    this.listText[textLower].count++;
-                } else {
-                    this.listText[textLower] = {
-                        text: text,
-                        count: 1
-                    };
+                let tabByTime = (new Date).toLocaleDateString();
+
+                if (tabByTime in this.listText && Object.keys(this.listText).length === 0) {
+                    delete this.listText[tabByTime];
                 }
 
+                if (tabByTime in this.listText && textLower in this.listText[tabByTime]) {
+                    this.listText[tabByTime][textLower].count++;
+                } else if (tabByTime in this.listText) {
+                    this.listText[tabByTime][textLower] = {
+                        text: text,
+                        count: 1
+                    }
+                } else {
+                    this.listText[tabByTime] = {
+                        date: tabByTime,
+                        [textLower]: {
+                            text: text,
+                            count: 1
+                        }
+                    }
+                }
+                console.log(this.listText)
                 this.render();
                 return this;
             }
             templateItem(text, key) {
-                return `<span class="translate_me" data-toggle="popover" data-translate="${text.text}"> ${text.text} - ${text.count} </span> <span class="close" data-key="${key}">X</span>`;
+                return `<li><span class="translate_me" data-toggle="popover" data-translate="${text.text}"> ${text.text} - ${text.count} </span> <span class="close" data-key="${key}">X</span></li>`;
             }
-            render() {
-                this.wrap.html('');
-                for (let key in this.listText) {
-                    this.wrap.append(
-                        $('<li>').html(this.templateItem(this.listText[key], key))
-                    )
-                }
 
+            setTab(content, key) {
+                let data = `<li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#${key.replace(/\//g, '_')}" data-active="${key.replace(/\//g, '_')}">${content}</a>
+                </li>`;
+                this.tab.append($(data));
+                return this;
+            }
+
+            setContent(content, key) {
+                let data = `<div id="${key.replace(/\//g, '_')}" class="container tab-pane">
+                            <ul>
+                                ${content}
+                            </ul>
+                        </div>`;
+
+                this.content.append($(data));
+                return this;
+            }
+
+            render() {
+                this.tab.html('');
+                this.content.html('');
+                for (let key in this.listText) {
+                    let list = '';
+                    for (let item in this.listText[key]) {
+                        list += this.templateItem(this.listText[key][item], item);
+                    }
+                    console.log(list)
+                    this.setTab(key, key);
+                    this.setContent(list, key);
+                }
+                this.activeTab();
                 this.storeCookie();
-                this.wrap.find('[data-toggle="popover"]').popover();
+            }
+            initTab() {
+                this.wrap.on('click', '[data-toggle="tab"]', function () {
+                    this.tabActive = $(this).attr('active');
+                    this.activeTab();
+                }.bind(this));
+            }
+            activeTab() {
+                $('#' + this.tabActive).tab('show');
             }
         }
 
