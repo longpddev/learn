@@ -218,9 +218,9 @@
         if (Cookies.get('myLearn')) {
             let data = JSON.parse(Cookies.get('myLearn'));
             for (let item in data) {
-                if ('date' in data) { }
+                if ('date' in data[item]) { }
                 else {
-                    let dateText = (new Date()).toDateString();
+                    let dateText = (new Date()).toLocaleDateString();
                     Cookies.set('myLearn', JSON.stringify({
                         [dateText]: {
                             date: dateText,
