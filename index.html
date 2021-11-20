@@ -94,6 +94,24 @@
             font-size: 1rem;
             padding-left: 40px;
         }
+
+        .nav-tabs .nav-item {
+            position: relative;
+        }
+
+        .nav-tabs .nav-item .badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 11px;
+            padding: .15em .3em;
+            opacity: .5;
+        }
+
+        .nav-tabs .nav-item .nav-link.active~.badge,
+        .nav-tabs .nav-item .nav-link:hover~.badge {
+            opacity: 1;
+        }
     </style>
     <div class="container">
         <div class="group">
@@ -305,7 +323,10 @@
 
             setTab(content, key) {
                 let data = `<li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#${key.replace(/\//g, '_')}" data-active="${key.replace(/\//g, '_')}">${content}</a>
+                    <a class="nav-link" data-toggle="tab" href="#${key.replace(/\//g, '_')}" data-active="${key.replace(/\//g, '_')}">
+                        ${content}
+                    </a>
+                    <span class="badge badge-info">${Object.keys(this.listText[key]).length}</span>
                 </li>`;
                 this.tab.append($(data));
                 return this;
