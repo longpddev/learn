@@ -294,10 +294,6 @@
                 let textLower = text.trim().toLowerCase().replace(/\s+/, '_');
                 let tabByTime = (new Date).toLocaleDateString();
 
-                if (tabByTime in this.listText && Object.keys(this.listText).length === 0) {
-                    delete this.listText[tabByTime];
-                }
-
                 if (tabByTime in this.listText && textLower in this.listText[tabByTime]) {
                     this.listText[tabByTime][textLower].count++;
                 } else if (tabByTime in this.listText) {
@@ -349,6 +345,12 @@
                 this.content.html('');
                 for (let key in this.listText) {
                     let list = '';
+
+                    if (Object.keys(this.listText[key]).length === 0) {
+                        delete this.listText[key];
+                        continue;
+                    }
+
                     for (let item in this.listText[key]) {
                         list += this.templateItem(this.listText[key][item], item);
                     }
