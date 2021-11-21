@@ -12,19 +12,6 @@ import search from './search.js';
 //     this.openPopup();
 // });
 
-if (Cookies.get('updated') != 'true') {
-    let data = JSON.parse(Cookies.get('myLearn'));
-    let dateText = (new Date()).toLocaleDateString();
-    Cookies.remove('myLearn');
-    Cookies.set('myLearn', JSON.stringify({
-        [dateText]: {
-            ...data
-        }
-    }), { expires: 365 });
-
-    Cookies.set('updated', 'true', { expires: 365 });
-}
-
 class word {
     listText = {};
     constructor() {

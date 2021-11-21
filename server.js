@@ -4,11 +4,27 @@ const https = require('https');
 var express = require('express');
 var cors = require('cors')
 var app = express();
+var fs = require('fs');
 
 // Add headers before the routes are defined
 app.use(cors({ origin: '*' }));
-
+app.use(express.static('public'));
 app.get('/', function (req, res) {
+    try {
+        fs.readFile(__dirname + '/index.html', function (err, data) {
+            if (err) {
+                throw err;
+            }
+            res.end(data.toString());
+        });
+    } catch (err) {
+        res.end('error');
+        console.log(err);
+    }
+
+})
+
+app.get('/search', function (req, res) {
     try {
         https.get(req.query.url, reps => {
             let data = '';

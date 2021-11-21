@@ -12,7 +12,7 @@ class search {
         ],
         dom: undefined,
     };
-    maskURl = 'http://localhost:8080?url=$url';
+    maskURl = '/search?url=$url';
     searchText;
     popup;
     constructor() {
