@@ -41,5 +41,5 @@ app.get('/search', function (req, res) {
         res.end('some error');
     }
 });
-app.listen(process.env.PORT || 80);
-console.log('Server is running on Port 80')
+app.listen(process.env.PORT || 8080);
+console.log('Server is running on Port 8080')
