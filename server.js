@@ -22,6 +22,7 @@ app.get('/', function (req, res) {
         })
     } catch (e) {
         console.log(e);
+        res.end('some error');
     }
 });
 app.listen(process.env.PORT || 8080);
