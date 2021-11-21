@@ -112,6 +112,30 @@
         .nav-tabs .nav-item .nav-link:hover~.badge {
             opacity: 1;
         }
+
+        .modal-body>div {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .popover-body ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .popover-body li {
+            margin-bottom: 10px;
+        }
+
+        .popover-body li:last-child {
+            margin-bottom: 0;
+        }
+
+        .popover-body li a {
+            color: #000;
+            cursor: pointer;
+        }
     </style>
     <div class="container">
         <div class="group">
@@ -215,184 +239,31 @@
         </div>
     </div>
 
+    <div class="modal" id="myModal">
+        <div class="modal-dialog  modal-dialog-scrollable modal-dialog-xl">
+            <div class="modal-content">
 
-    <script>
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Modal Heading</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
 
-        //listText = {
-        //    'date': {
-        //        text : {
-        //             text: text,
-        //             count: 1
-        //         }
-        //    },
-        //}
+                <!-- Modal body -->
+                <div class="modal-body">
+                    Modal body..
+                </div>
 
-        if (Cookies.get('updated') != 'true') {
-            let data = JSON.parse(Cookies.get('myLearn'));
-            let dateText = (new Date()).toLocaleDateString();
-            Cookies.remove('myLearn');
-            Cookies.set('myLearn', JSON.stringify({
-                [dateText]: {
-                    ...data
-                }
-            }), { expires: 365 });
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
 
-            Cookies.set('updated', 'true', { expires: 365 });
-        }
+            </div>
+        </div>
+    </div>
 
-        class word {
-            listText = {};
-            constructor() {
-                this.wrap = $('#body');
-                this.content = this.wrap.find('.tab-content');
-                this.tab = this.wrap.find('.nav-tabs');
-                this.tabActive = (new Date).toLocaleDateString().replace(/\//g, '_');
-                let _this = this;
-                let getInCookie = this.getCookie();
-                if (getInCookie) {
-                    this.listText = getInCookie
-                    this.render();
-                }
-
-                this.initTab();
-                this.wrap.on('click', '.close', function () {
-                    let key = $(this).data('key');
-                    let tabKey = $(this).parents('.tab-pane').attr('id').replace(/_/g, '/');
-                    key in _this.listText[tabKey] && delete _this.listText[tabKey][key];
-                    _this.render();
-                })
-
-                this.wrap.on('click', '.translate_me', function () {
-                    let data = $(this).data('translate');
-                    let _this = $(this);
-
-                    if (!_this.attr('title') && false)
-                        $.get('https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&hl=en-GB&dt=t&dt=bd&dj=1&source=bubble&q=' + data, function (data) {
-                            if (data) {
-                                let listTrans = '';
-                                'dict' in data && data.dict[0].terms.forEach(function (item) {
-                                    listTrans += item + ', ';
-                                })
-                                console.log(data.sentences[0].trans)
-                                _this.attr('title', data.sentences[0].trans)
-                                    .attr('data-original-title', data.sentences[0].trans)
-                                    .attr('data-content', listTrans);
-                            }
-                        })
-                })
-            }
-            storeCookie() {
-                Cookies.remove('myLearn');
-                Cookies.set('myLearn', JSON.stringify(this.listText), { expires: 365 });
-                return this;
-            }
-
-            getCookie() {
-                return Cookies.get('myLearn') ? JSON.parse(Cookies.get('myLearn')) : {};
-            }
-            setText(text) {
-                let textLower = text.trim().toLowerCase().replace(/\s+/, '_');
-                let tabByTime = (new Date).toLocaleDateString();
-
-                if (tabByTime in this.listText && textLower in this.listText[tabByTime]) {
-                    this.listText[tabByTime][textLower].count++;
-                } else if (tabByTime in this.listText) {
-                    this.listText[tabByTime][textLower] = {
-                        text: text,
-                        count: 1
-                    }
-                } else {
-                    this.listText[tabByTime] = {
-                        [textLower]: {
-                            text: text,
-                            count: 1
-                        }
-                    }
-                }
-                console.log(this.listText)
-                this.render();
-                return this;
-            }
-            templateItem(text, key) {
-                return `<li><span class="translate_me" data-toggle="popover" data-translate="${text.text}"> ${text.text} - ${text.count} </span> <span class="close" data-key="${key}">X</span></li>`;
-            }
-
-            setTab(content, key) {
-                let data = `<li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#${key.replace(/\//g, '_')}" data-active="${key.replace(/\//g, '_')}">
-                        ${content}
-                    </a>
-                    <span class="badge badge-info">${Object.keys(this.listText[key]).length}</span>
-                </li>`;
-                this.tab.append($(data));
-                return this;
-            }
-
-            setContent(content, key) {
-                let data = `<div id="${key.replace(/\//g, '_')}" class="container tab-pane">
-                            <ul>
-                                ${content}
-                            </ul>
-                        </div>`;
-
-                this.content.append($(data));
-                return this;
-            }
-
-            render() {
-                console.log(this.listText)
-                this.tab.html('');
-                this.content.html('');
-                for (let key in this.listText) {
-                    let list = '';
-
-                    if (Object.keys(this.listText[key]).length === 0) {
-                        delete this.listText[key];
-                        continue;
-                    }
-
-                    for (let item in this.listText[key]) {
-                        list += this.templateItem(this.listText[key][item], item);
-                    }
-                    console.log(list)
-                    this.setTab(key, key);
-                    this.setContent(list, key);
-                }
-                this.activeTab();
-                this.storeCookie();
-            }
-            initTab() {
-                let _this = this;
-                this.wrap.on('click', '[data-toggle="tab"]', function () {
-                    _this.tabActive = $(this).data('active');
-                    _this.activeTab();
-                });
-            }
-            activeTab() {
-                $('.tab-pane.active').removeClass('active');
-                $('#' + this.tabActive).tab('show');
-            }
-        }
-
-        let instantWord = new word();
-        $(function () {
-            $('#input').on('change', function () {
-                let val = $(this).val();
-                val.trim() && instantWord.setText(val), $(this).val('');
-            });
-
-            let watch;
-            $('#input').on('focus', function () {
-                clearTimeout(watch);
-                let _this = this;
-                watch = setTimeout(function () {
-                    let val = $(_this).val();
-                    val.trim() && instantWord.setText(val), $(_this).val('');
-                }, 1000);
-            })
-        })
-
-    </script>
+    <script src="/main.js" type="module" />
 </body>
 
 </html>
