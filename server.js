@@ -9,16 +9,20 @@ var app = express();
 app.use(cors({ origin: '*' }));
 
 app.get('/', function (req, res) {
-    https.get(req.query.url, reps => {
-        let data = '';
-        reps.on('data', chunk => {
-            data += chunk;
-        })
+    try {
+        https.get(req.query.url, reps => {
+            let data = '';
+            reps.on('data', chunk => {
+                data += chunk;
+            })
 
-        reps.on('end', () => {
-            res.end(data);
-        });
-    })
+            reps.on('end', () => {
+                res.end(data);
+            });
+        })
+    } catch (e) {
+        console.log(e);
+    }
 });
 app.listen(process.env.PORT || 8080);
 console.log('Server is running on Port 8080')
