@@ -1,0 +1,15 @@
+tạo simple nodejs:
+  - route đơn giản, 
+  - call website khác trên nodejs, 
+  - tạo tự động pull git khi có commit mới (auto deploy)
+  - tạo server runtime bằng cách sử dụng thư viện forever của npm 
+
+kiến thức: 
+  - bước đầu tiếp cận nodejs 
+  - cố gắng đóng gói chức năng bằng cách chủ động tách ra thành cách class, module 
+  - có tìm hiều vhost npm nhưng chưa áp dụng 
+
+
+tò mò: 
+  - làm sao deploy nhiều dự án nodejs trên cùng 1 module có thể tạo vhost như apache, nginx được không 
+  - nếu ta deploy bằng cách tạo 1 cổng 80 rồi add domain vào thì ta chỉ tạo được 1 dự án trên cùng một server (cùng 1 ip)

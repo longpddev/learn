@@ -30,8 +30,12 @@ class word {
         this.wrap.on('click', '.close', function () {
             let key = $(this).data('key');
             let tabKey = $(this).parents('.tab-pane').attr('id').replace(/_/g, '/');
-            key in _this.listText[tabKey] && delete _this.listText[tabKey][key];
-            _this.render();
+            if (key in _this.listText[tabKey]) {
+                delete _this.listText[tabKey][key]
+                $(this).parents('li').fadeOut(function () {
+                    _this.render();
+                })
+            }
         })
 
         this.wrap.on('click', '.translate_me', function () {
