@@ -184,6 +184,7 @@ class word {
     }
     activeTab() {
         $('.tab-pane.active').removeClass('active');
+        $('.nav-link.active').removeClass('active');
         $('#' + this.tabActive).tab('show');
         $(`[data-active="${this.tabActive}"]`).addClass('active');
     }
