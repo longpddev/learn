@@ -1,5 +1,4 @@
 import search from './search.js';
-
 //listText = {
 //    'date': {
 //        text : {
@@ -87,7 +86,6 @@ class word {
                 }
             }
         }
-        console.log(this.listText)
         this.render();
         return this;
     }
@@ -187,6 +185,7 @@ class word {
     activeTab() {
         $('.tab-pane.active').removeClass('active');
         $('#' + this.tabActive).tab('show');
+        $(`[data-active="${this.tabActive}"]`).addClass('active');
     }
 }
 
